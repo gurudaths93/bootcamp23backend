@@ -13,6 +13,83 @@ app.get('/', function (req, res) {
   res.send('Hello World!');
 });
 
+app.get('/getSurveyResults', function (req, res) {
+  fs.readFile("./surveyresults.json", "utf8", (err, jsonString) => {
+    if (err) {
+      console.log("File read failed:", err);
+      return;
+    }
+    console.log("File data:", jsonString);
+    let data1 = JSON.parse(jsonString);
+    res.send(data1);
+});
+
+});
+
+app.post('/insertQuestions',function(req,res){
+  questions = req.body.data;
+  console.log(questions)
+  console.log(questions.length)
+  let questionsArray = [];
+  for(let i=0;i<questions.length;i++){
+    let quest = {
+      "Q":questions[i],
+      "count":0,
+      "feedback":[]
+    }
+    questionsArray.push(quest);
+  }
+  console.log(questionsArray);
+  fs.readFile("./surveyresults.json", "utf8", (err, jsonString) => {
+    if (err) {
+      console.log("File read failed:", err);
+      return;
+    }
+    console.log("File data:", jsonString);
+    let data1 = JSON.parse(jsonString);
+    data1["feedbackResults"] = questionsArray;
+    fs.writeFile("surveyresults.json",JSON.stringify(data1), function(err) {
+      if(err) {
+          return console.log(err);
+      }
+      res.send({
+        "status":"success",
+        "message":"survey stored successfully"
+      })
+  });
+  res.send({
+    "status":"success",
+    "message":"questions saved successfully"
+  });
+});
+});
+
+app.get('/resetSurvey', function (req, res) {
+  fs.readFile("./surveyresults.json", "utf8", (err, jsonString) => {
+    if (err) {
+      console.log("File read failed:", err);
+      return;
+    }
+    console.log("File data:", jsonString);
+    let data1 = JSON.parse(jsonString);
+    for(let i=0;i<data1.feedbackResults.length;i++){
+      data1.feedbackResults[i]["count"] = 0;  
+      data1.feedbackResults[0]["feedback"] = [];
+    }
+    data1.feedback = []
+
+    fs.writeFile("surveyresults.json",JSON.stringify(data1), function(err) {
+        if(err) {
+            return console.log(err);
+        }
+        res.send({
+          "status":"success",
+          "message":"data was reset"
+        })
+    });
+  });
+});
+
 app.post('/submitSurvey', function (req, res) {
     // console.log(req.body.data);
     surveyResults = req.body.data;
@@ -25,18 +102,12 @@ app.post('/submitSurvey', function (req, res) {
         }
         console.log("File data:", jsonString);
         let data1 = JSON.parse(jsonString);
-        data1.feedbackResults[0]["count"] = data1.feedbackResults[0]["count"] +1;
-        data1.feedbackResults[1]["count"] = data1.feedbackResults[1]["count"] +1;
-        data1.feedbackResults[2]["count"] = data1.feedbackResults[2]["count"] +1;
-        data1.feedbackResults[3]["count"] = data1.feedbackResults[3]["count"] +1;
-        data1.feedbackResults[4]["count"] = data1.feedbackResults[4]["count"] +1;
-        data1.feedbackResults[0]["feedback"].push(surveyResults[0])
-        data1.feedbackResults[1]["feedback"].push(surveyResults[1])
-        data1.feedbackResults[2]["feedback"].push(surveyResults[2])
-        data1.feedbackResults[3]["feedback"].push(surveyResults[3])
-        data1.feedbackResults[4]["feedback"].push(surveyResults[4])
-        if(surveyResults[5] != ""){
-            data1.feedback.push(surveyResults[5])
+        for(let i=0;i<data1.feedbackResults.length;i++){
+          data1.feedbackResults[i]["count"] = data1.feedbackResults[i]["count"] +1;;  
+          data1.feedbackResults[i]["feedback"].push(surveyResults[i]);
+        }
+        if(surveyResults[data1.feedbackResults.length] != ""){
+            data1.feedback.push(surveyResults[data1.feedbackResults.length])
 
         }
 
@@ -44,7 +115,10 @@ app.post('/submitSurvey', function (req, res) {
             if(err) {
                 return console.log(err);
             }
-            res.send("file was savedhunok")
+            res.send({
+              "status":"success",
+              "message":"survey stored successfully"
+            })
         });
       });
     
@@ -52,5 +126,5 @@ app.post('/submitSurvey', function (req, res) {
 
  
 app.listen(port, function () {
-  console.log('Example app listening on port 3000!');
+  console.log('Example app listening on port 1337!');
 });
