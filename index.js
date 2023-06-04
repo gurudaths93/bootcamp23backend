@@ -74,7 +74,7 @@ app.get('/resetSurvey', function (req, res) {
     let data1 = JSON.parse(jsonString);
     for(let i=0;i<data1.feedbackResults.length;i++){
       data1.feedbackResults[i]["count"] = 0;  
-      data1.feedbackResults[0]["feedback"] = [];
+      data1.feedbackResults[i]["feedback"] = [];
     }
     data1.feedback = []
 
