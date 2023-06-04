@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 const fs = require('fs');
 
+const port = process.env.PORT || 1337;
 const bodyParser = require('body-parser')
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -50,6 +51,6 @@ app.post('/submitSurvey', function (req, res) {
   });
 
  
-app.listen(3000, function () {
+app.listen(port, function () {
   console.log('Example app listening on port 3000!');
 });
