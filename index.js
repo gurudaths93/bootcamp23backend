@@ -33,7 +33,8 @@ app.post('/insertQuestions',function(req,res){
   let questionsArray = [];
   for(let i=0;i<questions.length;i++){
     let quest = {
-      "Q":questions[i],
+      "Q":questions[i]["question"],
+      "options":questions[i]["options"],
       "count":0,
       "feedback":[]
     }
@@ -102,12 +103,15 @@ app.post('/submitSurvey', function (req, res) {
         }
         console.log("File data:", jsonString);
         let data1 = JSON.parse(jsonString);
+        console.log(data1.feedbackResults[0]["count"])
+        console.log(data1.feedbackResults[0]["feedback"])
         for(let i=0;i<data1.feedbackResults.length;i++){
           data1.feedbackResults[i]["count"] = data1.feedbackResults[i]["count"] +1;;  
           data1.feedbackResults[i]["feedback"].push(surveyResults[i]);
         }
-        if(surveyResults[data1.feedbackResults.length] != ""){
-            data1.feedback.push(surveyResults[data1.feedbackResults.length])
+        console.log(data1);
+        if(surveyResults[data1.feedbackResults.length]["feedback"]["feedbackText"] != ""){
+            data1.feedback.push(surveyResults[data1.feedbackResults.length]["feedback"])
 
         }
 
